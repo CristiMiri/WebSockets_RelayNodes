@@ -14,7 +14,10 @@ public class RelayNode extends Thread {
     public RelayNode(String receiveAddr, int receivePort) {
         try {
             InetAddress addr = InetAddress.getByName(receiveAddr);
-            receiver = new ServerSocket(receivePort, 200, addr);
+            // receiver = new ServerSocket(receivePort, 200, addr);
+            InetSocketAddress socketAddress = new InetSocketAddress(addr, receivePort);
+            receiver = new ServerSocket();
+            receiver.bind(socketAddress);
             IpAddres = receiveAddr;
             port = receivePort;
         } catch (Exception e) {
@@ -25,8 +28,10 @@ public class RelayNode extends Thread {
     public void setHopPoint(String hopAddress, int hopPort) {
         this.hopAddress = hopAddress;
         this.hopPort = hopPort;
+        InetAddress addr = null;
         try {
-            sender = new Socket(hopAddress, hopPort);
+            addr = InetAddress.getByName(hopAddress);
+            sender = new Socket(addr, hopPort);
             outobj = new ObjectOutputStream(sender.getOutputStream());
         } catch (Exception e) {
             e.printStackTrace();
@@ -34,16 +39,21 @@ public class RelayNode extends Thread {
     }
 
     public void processPayload(Payload p) throws IOException {
+
         if (p.getIpAddress().equals(IpAddres)) {
             System.out.println("Message " + p.getValue() + " received from " + p.getIpAddress());
         } else {
-            outobj.writeObject(p);
+            if (outobj == null)
+                System.out.println("invalid address");
+            else
+                outobj.writeObject(p);
         }
     }
 
     public void run() {
         try {
             Socket reader = receiver.accept();
+            System.out.println(reader);
             inobj = new ObjectInputStream(reader.getInputStream());
             Payload p = null;
             while (true) {
