@@ -17,8 +17,8 @@ public class App {
         D1.start();
         D2.start();
         D3.start();
-        Sender sender = new Sender("127.0.0.1", 5001);
-        sender.send(payLoads);
+        Sender sender = new Sender("127.0.0.15", 5001);
+        sender.send(payLoads, 0);
 
         // InetAddress address2 = InetAddress.getByName("127.0.0.2");
         // System.out.println(address2.getHostName());

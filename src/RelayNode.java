@@ -8,10 +8,8 @@ public class RelayNode extends Thread {
     private int port = 0;
     private String hopAddress = null;
     private int hopPort = 0;
-    private PrintWriter out = null;
     private ObjectOutputStream outobj = null;
     private ObjectInputStream inobj = null;
-    private BufferedReader in = null;
 
     public RelayNode(String receiveAddr, int receivePort) {
         try {
@@ -29,14 +27,13 @@ public class RelayNode extends Thread {
         this.hopPort = hopPort;
         try {
             sender = new Socket(hopAddress, hopPort);
-            // out = new PrintWriter(sender.getOutputStream(), true);
             outobj = new ObjectOutputStream(sender.getOutputStream());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void processPayload(Payload p) {
+    public void processPayload(Payload p) throws IOException {
         if (p.getIpAddress().equals(IpAddres)) {
             System.out.println("Message " + p.getValue() + " received from " + p.getIpAddress());
         } else {
@@ -44,37 +41,14 @@ public class RelayNode extends Thread {
         }
     }
 
-    public void fowardMessage(String message) {
-        if (out != null)
-            out.println(message);
-        else {
-            System.out.println("No hop point set/Address not found");
-        }
-    }
-
     public void run() {
         try {
             Socket reader = receiver.accept();
-            // in = new BufferedReader(new InputStreamReader(reader.getInputStream()));
             inobj = new ObjectInputStream(reader.getInputStream());
             Payload p = null;
             while (true) {
                 p = (Payload) inobj.readObject();
                 processPayload(p);
-                // //String message = in.readLine();
-                // System.out.println("Message received: " + message);
-                // String[] parts = message.split(":");
-                // String ip = parts[0];
-                // int value = Integer.parseInt(parts[1]);
-                // Payload p = new Payload(ip, value);
-                // System.out.println(ip + " " + IpAddres);
-                // if (ip.equals(IpAddres)) {
-                // System.out.println("Message " + value + " received from " + ip);
-                // continue;
-                // } else {
-                // // fowardMessage(message);
-                // outobj.writeObject(p);
-                // }
             }
         } catch (Exception e) {
             e.printStackTrace();
