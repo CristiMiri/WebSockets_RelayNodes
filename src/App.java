@@ -1,29 +1,22 @@
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
 
 public class App {
     public static void main(String[] args) throws Exception {
-
-        List<String> payLoads = new ArrayList<String>();
-        List<InetAddress> addresses = new ArrayList<InetAddress>();
-        addresses.add(InetAddress.getByName("127.0.0.3"));
-        addresses.add(InetAddress.getByName("127.0.0.2"));
-        addresses.add(InetAddress.getByName("127.0.0.1"));
-        addresses.add(InetAddress.getByName("127.0.0.4"));
-        payLoads.add("127.0.0.3");
-        payLoads.add("127.0.0.2");
-        payLoads.add("127.0.0.1");
-
+        // Create the nodes in the network.
         RelayNode D3 = new RelayNode("127.0.0.3", 5003);
         RelayNode D2 = new RelayNode("127.0.0.2", 5002);
         RelayNode D1 = new RelayNode("127.0.0.1", 5001);
+        // Setup the connections between the nodes.
         D2.setHopPoint("127.0.0.3", 5003);
         D1.setHopPoint("127.0.0.2", 5002);
-        D1.start();
-        D2.start();
+        // Start the nodes.
         D3.start();
+        D2.start();
+        D1.start();
+        // Create the sender and send the payloads.
         Sender sender = new Sender("127.0.0.1", 5001);
-        sender.sendInet(addresses, 0);
+        sender.send(0);
+        // For wireShark to filter out the packets sent by the sender
+        // use tcp.port ==5003 || tcp.port ==5002 || tcp.port ==5001 for
+        // filtering.
     }
 }
